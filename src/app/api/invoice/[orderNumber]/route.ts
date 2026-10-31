@@ -20,12 +20,15 @@ export async function GET(
     }
 
     const pdfBytes = await generateInvoicePdf(order);
+    const searchParams = request.nextUrl.searchParams;
+    const isDownload = searchParams.get('download') === 'true' || searchParams.has('download');
+    const dispositionType = isDownload ? 'attachment' : 'inline';
 
     return new NextResponse(Buffer.from(pdfBytes), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="Karadi-Crackers-Invoice-${order.orderNumber}.pdf"`,
+        'Content-Disposition': `${dispositionType}; filename="Karadi-Crackers-Invoice-${order.orderNumber}.pdf"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     });

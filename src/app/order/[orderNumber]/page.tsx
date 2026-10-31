@@ -11,6 +11,7 @@ import {
   Sparkles,
   ShoppingBag,
 } from 'lucide-react';
+import DownloadInvoiceButton from '@/components/DownloadInvoiceButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,15 +103,7 @@ _I will visit the shop and collect my order._`;
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <a
-                href={`/api/invoice/${order.orderNumber}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 bg-[#D40000] hover:bg-[#B00000] text-white font-extrabold rounded-xl shadow-md transition-all active:scale-95 text-xs border border-[#FFC400] cursor-pointer"
-              >
-                <FileDown className="w-4 h-4 text-[#FFC400]" />
-                <span>Download PDF Invoice</span>
-              </a>
+              <DownloadInvoiceButton orderNumber={order.orderNumber} variant="primary" />
 
               <div className="text-right flex items-center gap-1.5">
                 <span className="text-[10px] font-bold text-gray-400 uppercase hidden sm:inline">Order #:</span>
@@ -256,15 +249,7 @@ _I will visit the shop and collect my order._`;
               </div>
 
               {/* PDF Invoice Download Button */}
-              <a
-                href={`/api/invoice/${order.orderNumber}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 px-3 bg-white hover:bg-gray-50 text-gray-900 font-extrabold rounded-xl shadow-xs transition-colors border-2 border-gray-300 flex items-center justify-center gap-2 text-xs hover:border-[#D40000] cursor-pointer"
-              >
-                <FileDown className="w-4 h-4 text-[#D40000]" />
-                <span>Download PDF Invoice</span>
-              </a>
+              <DownloadInvoiceButton orderNumber={order.orderNumber} variant="secondary" />
             </div>
           </div>
 

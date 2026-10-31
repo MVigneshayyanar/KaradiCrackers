@@ -68,6 +68,32 @@ export default function ManageOrdersClient({
   const [itemSearchQuery, setItemSearchQuery] = useState('');
 
   // Out of stock lookup map
+  // Helper to trigger both download to device and open preview tab
+  const triggerDownloadAndOpen = async (orderNumber: string) => {
+    const invoiceUrl = `/api/invoice/${encodeURIComponent(orderNumber)}`;
+    const filename = `Karadi-Crackers-Invoice-${orderNumber}.pdf`;
+    try {
+      const res = await fetch(invoiceUrl);
+      if (!res.ok) throw new Error('Failed to fetch invoice');
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      const previewWin = window.open(blobUrl, '_blank');
+      if (!previewWin) window.open(invoiceUrl, '_blank');
+
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
+      toast.success('Invoice downloaded & opened');
+    } catch {
+      window.open(invoiceUrl, '_blank');
+    }
+  };
   const outOfStockMap = useMemo(() => {
     const map = new Map<string, boolean>();
     allCrackers.forEach((c) => {
@@ -787,14 +813,14 @@ export default function ManageOrdersClient({
                             >
                               <Eye className="w-3.5 h-3.5" />
                             </button>
-                            <a
-                              href={`/api/invoice/${ord.orderNumber}`}
-                              target="_blank"
-                              className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                              title="Download Invoice PDF"
+                            <button
+                              type="button"
+                              onClick={() => triggerDownloadAndOpen(ord.orderNumber)}
+                              className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                              title="Download & Open Invoice PDF"
                             >
                               <FileText className="w-3.5 h-3.5" />
-                            </a>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -1015,14 +1041,15 @@ export default function ManageOrdersClient({
               {/* Action Buttons */}
               <div className="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between gap-2 shrink-0">
                 <div className="flex items-center gap-1.5">
-                  <a
-                    href={`/api/invoice/${editingOrder.orderNumber}`}
-                    target="_blank"
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-gray-300 text-gray-700 text-[11px] font-bold hover:bg-gray-100"
+                  <button
+                    type="button"
+                    onClick={() => triggerDownloadAndOpen(editingOrder.orderNumber)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-gray-300 text-gray-700 text-[11px] font-bold hover:bg-gray-100 cursor-pointer"
+                    title="Download & Open Invoice PDF"
                   >
                     <FileText className="w-3 h-3 text-red-600" />
                     <span>PDF</span>
-                  </a>
+                  </button>
 
                   {editingOrder.status !== 'DELIVERED' && (
                     <button
